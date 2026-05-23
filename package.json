@@ -1,0 +1,10 @@
+{
+  "name": "frazer-pta",
+  "version": "1.0.0",
+  "description": "Frazer School PTA website",
+  "type": "module",
+  "scripts": {
+    "build": "node build_html.js",
+    "dev": "node build_html.js && npx --yes serve dist -l 3000"
+  }
+}
