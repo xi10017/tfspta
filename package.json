@@ -4,7 +4,8 @@
   "description": "Frazer School PTA website",
   "type": "module",
   "scripts": {
-    "build": "node build_html.js",
-    "dev": "node build_html.js && npx --yes serve dist -l 3000"
+    "import": ".venv/bin/python scripts/import_activities.py",
+    "build": "npm run import && node build_html.js",
+    "dev": "npm run build && npx --yes serve dist -l 3000"
   }
 }

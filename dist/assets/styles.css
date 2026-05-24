@@ -822,6 +822,137 @@ a:hover {
   color: var(--color-white);
 }
 
+.entry-link-wrap:has(.entry-link[href=""]) {
+  display: none;
+}
+
+.competition-category,
+.competitions-page .school-tier-title {
+  scroll-margin-top: 5rem;
+}
+
+.category-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.category-nav a {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.category-nav a:hover {
+  border-color: var(--color-red);
+  background: var(--color-off-white);
+}
+
+.competition-list,
+.club-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.competition-entry,
+.club-entry {
+  padding: 1.5rem;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.entry-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.competition-entry h4,
+.club-entry h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--color-blue);
+}
+
+.entry-level {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-white);
+  background: var(--color-red);
+  border-radius: 4px;
+}
+
+.entry-level:empty {
+  display: none;
+}
+
+.entry-description {
+  margin: 0 0 1rem;
+}
+
+.entry-details {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.entry-details dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.entry-details dd {
+  margin: 0;
+}
+
+.entry-notes {
+  margin: 1rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+}
+
+.entry-notes:empty {
+  display: none;
+}
+
+.entry-link {
+  display: inline-block;
+  margin-top: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .entry-details {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .competition-list,
+  .club-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .site-footer a:hover {
   color: var(--color-red-light);
 }
