@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Generate competition and club templates from TFS Activities.xlsx."""
+"""Generate empty competition/club page shells for the static site build.
+
+Live listings come from approved submissions in Supabase, not from TFS Activities.xlsx.
+"""
 
 import html
 import re
@@ -228,24 +231,21 @@ def write_competitions(by_category: dict[str, list[dict]]) -> None:
     lines = [
         '<section class="section competitions-page">',
         "  <div class=\"container\">",
-        "    <p class=\"section-intro\">Academic and activity competitions at The Frazer School, organized by subject area. Information is synced from the TFS Activities spreadsheet.</p>",
+        '    <div id="contextual-submit" class="contextual-submit" hidden></div>',
+        '    <div id="competitions-live-notice"></div>',
+        "    <p class=\"section-intro\">Competitions on this page are added after a parent proposal is submitted and a PTA admin approves it.</p>",
         '    <nav class="category-nav" aria-label="Competition categories">',
     ]
-    for category in by_category:
+    for category in COMPETITION_SHEETS:
         lines.append(
             f'      <a href="#{slugify(category)}">{html.escape(category)}</a>'
         )
     lines.append("    </nav>")
 
-    for category, entries in by_category.items():
-        if not entries:
-            continue
+    for category in COMPETITION_SHEETS:
         lines.append(f'    <div class="competition-category" id="{slugify(category)}">')
         lines.append(f'      <h3 class="school-tier-title">{html.escape(category)}</h3>')
-        lines.append('      <div class="competition-list">')
-        for entry in entries:
-            lines.append(competition_entry_tag(entry))
-        lines.append("      </div>")
+        lines.append('      <div class="competition-list"></div>')
         lines.append("    </div>")
 
     lines.extend(["  </div>", "</section>", ""])
@@ -256,41 +256,26 @@ def write_clubs(entries: list[dict]) -> None:
     lines = [
         '<section class="section clubs-page">',
         "  <div class=\"container\">",
-        "    <p class=\"section-intro\">Non-competitive clubs and student organizations at The Frazer School.</p>",
+        '    <div id="contextual-submit" class="contextual-submit" hidden></div>',
+        '    <div id="clubs-live-notice"></div>',
+        "    <p class=\"section-intro\">Clubs on this page are added after a parent proposal is submitted and a PTA admin approves it.</p>",
         '    <div class="club-list">',
+        "    </div>",
+        "  </div>",
+        "</section>",
+        "",
     ]
-    for entry in entries:
-        lines.append(club_entry_tag(entry))
-    lines.extend(
-        [
-            "    </div>",
-            "  </div>",
-            "</section>",
-            "",
-        ]
-    )
     (TEMPLATES / "site-clubs.html").write_text("\n".join(lines), encoding="utf-8")
 
 
 def main() -> None:
-    wb = openpyxl.load_workbook(XLSX, data_only=True)
-    by_category: dict[str, list[dict]] = {}
+    # Live competitions/clubs come from approved submissions in Supabase, not the spreadsheet.
+    write_competitions({})
+    write_clubs([])
 
-    for sheet_name in COMPETITION_SHEETS:
-        if sheet_name not in wb.sheetnames:
-            continue
-        entries = parse_competition_sheet(wb[sheet_name], sheet_name)
-        if entries:
-            by_category[sheet_name] = entries
-
-    clubs = parse_clubs_sheet(wb["Clubs"]) if "Clubs" in wb.sheetnames else []
-
-    write_competitions(by_category)
-    write_clubs(clubs)
-
-    total = sum(len(v) for v in by_category.values())
-    print(f"Generated {total} competitions in {len(by_category)} categories")
-    print(f"Generated {len(clubs)} clubs")
+    print(f"Generated empty competition shells ({len(COMPETITION_SHEETS)} categories)")
+    print("Generated empty clubs shell")
+    print("Spreadsheet rows are not written to the public site.")
 
 
 if __name__ == "__main__":

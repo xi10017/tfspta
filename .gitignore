@@ -1,3 +1,5 @@
 node_modules/
 .venv/
 .DS_Store
+src/assets/supabase-config.js
+dist/assets/supabase-config.js

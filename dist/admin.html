@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Review and approve parent-submitted website updates.">
+  <title>Admin inbox · Frazer School PTA</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+</head>
+
+<body class="page-admin">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html">
+      <span class="logo-mark" aria-hidden="true">F</span>
+      <span class="logo-text">Frazer School PTA</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="competitions.html">Competitions</a>
+      <a href="clubs.html">Clubs</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="announcements.html">Announcements</a>
+      <a href="about-us.html">About Us</a>
+      <a href="contacts.html">Contacts</a>
+      <a href="submit.html">Submit</a>
+    </nav>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <section class="page-hero" aria-labelledby="page-title">
+  <div class="container">
+    <h1 id="page-title">Admin inbox</h1>
+    <p class="page-hero-lead">Review queue, live site, rejected proposals, and archive.</p>
+  </div>
+</section>
+
+
+    <section class="section workflow-section">
+      <div class="container admin-container">
+        <div id="config-notice" class="notice-card" hidden>
+          <h2>Setup required</h2>
+          <p>Configure Supabase (<code>supabase-config.js</code>) and run <code>supabase/schema.sql</code> before using the inbox.</p>
+        </div>
+
+        <div id="auth-panel" class="card workflow-card" hidden>
+          <div id="admin-signin-block">
+            <h2>Admin sign in</h2>
+            <div id="auth-message" class="alert-banner" hidden></div>
+            <form id="auth-form" class="stack-form">
+              <div class="form-field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" required autocomplete="email">
+              </div>
+              <div class="form-field">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" required autocomplete="current-password">
+                <p class="auth-forgot">
+                  <button type="button" class="text-link" id="forgot-password-btn">Forgot password?</button>
+                </p>
+              </div>
+              <button class="btn btn-primary" type="submit">Sign in</button>
+            </form>
+          </div>
+
+          <div id="reset-panel" hidden>
+            <h2>Reset password</h2>
+            <p class="section-intro">Enter your email and we will send you a link to choose a new password.</p>
+            <div id="reset-message" class="alert-banner" hidden></div>
+            <form id="reset-form" class="stack-form">
+              <div class="form-field">
+                <label for="reset-email">Email</label>
+                <input id="reset-email" name="reset-email" type="email" required autocomplete="email">
+              </div>
+              <button class="btn btn-primary" type="submit">Send reset link</button>
+            </form>
+            <p class="auth-forgot">
+              <button type="button" class="text-link" id="reset-back-btn">Back to sign in</button>
+            </p>
+          </div>
+        </div>
+
+        <div id="denied-panel" class="notice-card" hidden>
+          <h2>Admin access only</h2>
+          <p>This inbox is for PTA admins. Your account is signed in but does not have the admin role yet.</p>
+          <p id="denied-details" class="denied-details"></p>
+          <p>In Supabase SQL Editor, run <code>supabase/promote-admin.sql</code>, then sign out and sign in again.</p>
+          <p>
+            <button type="button" class="btn btn-secondary" id="admin-sign-out-denied">Sign out</button>
+            <a class="btn btn-secondary" href="submit.html">Back to submit page</a>
+          </p>
+        </div>
+
+        <div id="admin-panel" class="card workflow-card" hidden>
+          <div class="workflow-toolbar">
+            <p>Signed in as <strong id="admin-user-label"></strong></p>
+            <div class="workflow-toolbar-actions">
+              <a class="btn btn-secondary" href="submit.html">Submit page</a>
+              <button class="btn btn-secondary" type="button" id="sign-out-btn">Sign out</button>
+            </div>
+          </div>
+
+          <div id="admin-message" class="alert-banner" hidden></div>
+
+          <div class="auth-tabs admin-tabs" role="tablist" aria-label="Admin">
+            <button type="button" class="auth-tab is-active" id="tab-admin-inbox" role="tab" aria-selected="true" aria-controls="admin-inbox-panel">Review queue</button>
+            <button type="button" class="auth-tab" id="tab-admin-published" role="tab" aria-selected="false" aria-controls="admin-published-panel">Live</button>
+            <button type="button" class="auth-tab" id="tab-admin-rejected" role="tab" aria-selected="false" aria-controls="admin-rejected-panel">Rejected</button>
+            <button type="button" class="auth-tab" id="tab-admin-archive" role="tab" aria-selected="false" aria-controls="admin-archive-panel">Archive</button>
+          </div>
+
+          <div id="admin-inbox-panel" class="admin-tab-panel" role="tabpanel" aria-labelledby="tab-admin-inbox">
+            <p class="section-intro">Pending submissions waiting for approve or reject.</p>
+            <div id="inbox" class="inbox"></div>
+          </div>
+
+          <div id="admin-published-panel" class="admin-tab-panel" role="tabpanel" aria-labelledby="tab-admin-published" hidden>
+            <p class="section-intro">Content on the website. Use <strong>Revert to previous</strong> after an approved edit to undo one step. Archive removes an item from the site (moves to the Archive tab).</p>
+            <div class="admin-published">
+              <h3 class="school-tier-title">Published announcements</h3>
+              <div id="published-announcements" class="published-list"></div>
+
+              <h3 class="school-tier-title">Published calendar events</h3>
+              <div id="published-events" class="published-list"></div>
+
+              <h3 class="school-tier-title">Published competitions</h3>
+              <div id="published-competitions" class="published-list"></div>
+
+              <h3 class="school-tier-title">Published clubs</h3>
+              <div id="published-clubs" class="published-list"></div>
+            </div>
+          </div>
+
+          <div id="admin-rejected-panel" class="admin-tab-panel" role="tabpanel" aria-labelledby="tab-admin-rejected" hidden>
+            <p class="section-intro">Declined proposals. Approve to publish, return to queue to review again, or archive for cleanup.</p>
+            <div id="rejected-inbox" class="inbox"></div>
+          </div>
+
+          <div id="admin-archive-panel" class="admin-tab-panel" role="tabpanel" aria-labelledby="tab-admin-archive" hidden>
+            <p class="section-intro">Off-site items kept for history. Return to queue to review again, or delete permanently to clean up.</p>
+            <h3 class="school-tier-title">Archived submissions</h3>
+            <div id="archived-submissions" class="inbox"></div>
+            <h3 class="school-tier-title">Other archived items</h3>
+            <p class="section-intro">Published items with no linked submission (e.g. legacy entries).</p>
+            <div id="archived-orphans" class="published-list"></div>
+          </div>
+
+          <div class="account-settings">
+            <button type="button" class="text-link" id="change-password-toggle">Change password</button>
+            <div id="change-password-panel" class="change-password-panel" hidden>
+              <div id="change-password-message" class="alert-banner" hidden></div>
+              <form id="change-password-form" class="stack-form">
+                <div class="form-field">
+                  <label for="new-password">New password</label>
+                  <input id="new-password" name="new-password" type="password" required minlength="8" autocomplete="new-password">
+                </div>
+                <div class="form-field">
+                  <label for="confirm-password">Confirm new password</label>
+                  <input id="confirm-password" name="confirm-password" type="password" required minlength="8" autocomplete="new-password">
+                </div>
+                <button class="btn btn-secondary" type="submit">Update password</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+  <div class="container footer-inner">
+    <p>&copy; 2025 Frazer School PTA. All rights reserved.</p>
+    <p class="footer-note">Serving Frazer Middle School and Frazer High School. Maintained by parent volunteers.</p>
+  </div>
+</footer>
+
+  <script src="assets/main.js"></script>
+  <script type="module" src="assets/admin.js"></script>
+</body>
+</html>
