@@ -356,14 +356,11 @@ async function loadEvents(showChangeRequests = false, viewerId = null) {
 
     if (!allEvents.length) {
       hasInitializedView = false;
-      liveRoot.innerHTML = '<p class="empty-live">No published calendar events yet.</p>';
-      if (staticFallback) {
-        staticFallback.hidden = false;
-      }
-      return;
+      pickInitialSelection([]);
+    } else {
+      pickInitialSelection(allEvents);
     }
 
-    pickInitialSelection(allEvents);
     renderPage(showChangeRequests, hasPending);
 
     if (staticFallback) {
