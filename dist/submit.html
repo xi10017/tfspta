@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Parents can propose announcements and calendar events for PTA review.">
+  <title>Submit an update · Frazer School PTA</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+</head>
+
+<body class="page-submit">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html">
+      <span class="logo-mark" aria-hidden="true">F</span>
+      <span class="logo-text">Frazer School PTA</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="competitions.html">Competitions</a>
+      <a href="clubs.html">Clubs</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="announcements.html">Announcements</a>
+      <a href="about-us.html">About Us</a>
+      <a href="contacts.html">Contacts</a>
+      <a href="submit.html">Submit</a>
+    </nav>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <section class="page-hero" aria-labelledby="page-title">
+  <div class="container">
+    <h1 id="page-title">Submit an update</h1>
+    <p class="page-hero-lead">Propose an announcement, calendar event, competition, or club. A PTA admin will review it before it goes live — like a pull request for the website.</p>
+  </div>
+</section>
+
+
+    <section class="section workflow-section">
+      <div class="container workflow-container">
+        <div id="config-notice" class="notice-card" hidden>
+          <h2>Setup required</h2>
+          <p>Copy <code>src/assets/supabase-config.example.js</code> to <code>src/assets/supabase-config.js</code>, add your Supabase URL and anon key, then run <code>npm run build</code>.</p>
+          <p>Also run <code>supabase/schema.sql</code> in your Supabase SQL editor.</p>
+        </div>
+
+        <div id="auth-panel" class="card workflow-card">
+          <div id="signin-block">
+            <div class="auth-tabs" role="tablist" aria-label="Account">
+              <button type="button" class="auth-tab is-active" id="tab-signin" role="tab" aria-selected="true">Sign in</button>
+              <button type="button" class="auth-tab" id="tab-signup" role="tab" aria-selected="false">Sign up</button>
+            </div>
+            <h2 id="auth-heading">Sign in to contribute</h2>
+            <p class="section-intro" id="auth-intro">Enter your email and password to submit updates.</p>
+            <div id="auth-message" class="alert-banner" hidden></div>
+            <form id="auth-form" class="stack-form">
+              <div class="form-field" id="full-name-wrap" hidden>
+                <label for="full-name">Full name</label>
+                <input id="full-name" name="full-name" type="text" maxlength="120">
+              </div>
+              <div class="form-field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" required autocomplete="email">
+              </div>
+              <div class="form-field">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" required minlength="8" autocomplete="current-password">
+                <p class="auth-forgot" id="forgot-password-wrap">
+                  <button type="button" class="text-link" id="forgot-password-btn">Forgot password?</button>
+                </p>
+              </div>
+              <button class="btn btn-primary" type="submit" id="auth-submit">Sign in</button>
+            </form>
+          </div>
+
+          <div id="reset-panel" hidden>
+            <h2>Reset password</h2>
+            <p class="section-intro">Enter your email and we will send you a link to choose a new password.</p>
+            <div id="reset-message" class="alert-banner" hidden></div>
+            <form id="reset-form" class="stack-form">
+              <div class="form-field">
+                <label for="reset-email">Email</label>
+                <input id="reset-email" name="reset-email" type="email" required autocomplete="email">
+              </div>
+              <button class="btn btn-primary" type="submit">Send reset link</button>
+            </form>
+            <p class="auth-forgot">
+              <button type="button" class="text-link" id="reset-back-btn">Back to sign in</button>
+            </p>
+          </div>
+        </div>
+
+        <div id="submit-panel" class="card workflow-card" hidden>
+          <div class="workflow-toolbar">
+            <p>Signed in as <strong id="user-label"></strong></p>
+            <div class="workflow-toolbar-actions">
+              <a class="btn btn-secondary" href="admin.html">Admin inbox</a>
+              <button class="btn btn-secondary" type="button" id="sign-out-btn">Sign out</button>
+            </div>
+          </div>
+
+          <div id="submit-message" class="alert-banner" hidden></div>
+
+          <div class="auth-tabs submit-tabs" role="tablist" aria-label="Submit">
+            <button type="button" class="auth-tab is-active" id="tab-submit-new" role="tab" aria-selected="true" aria-controls="submit-new-panel">New submission</button>
+            <button type="button" class="auth-tab" id="tab-my-submissions" role="tab" aria-selected="false" aria-controls="my-submissions-panel">My submissions</button>
+          </div>
+
+          <div id="submit-new-panel" class="submit-tab-panel" role="tabpanel" aria-labelledby="tab-submit-new">
+            <div id="submit-draft-notice" class="alert-banner alert-banner--info" hidden></div>
+            <div class="contextual-compose-layout submit-compose-layout">
+              <form id="submit-form" class="stack-form submit-compose-form">
+                <div class="form-field">
+                  <label for="content-type">What are you updating?</label>
+                  <select id="content-type" name="content-type">
+                    <option value="announcement">Announcement</option>
+                    <option value="event">Calendar event</option>
+                    <option value="competition">Competition</option>
+                    <option value="club">Club</option>
+                  </select>
+                </div>
+                <div id="type-fields"></div>
+                <div class="submit-form-actions">
+                  <button class="btn btn-primary" type="submit" id="submit-form-submit">Submit for review</button>
+                  <button class="btn btn-secondary" type="button" id="submit-draft-cancel" hidden>Cancel editing</button>
+                </div>
+              </form>
+              <div class="contextual-preview">
+                <p class="contextual-preview-label">Preview on the site</p>
+                <div id="submit-preview-card" class="contextual-preview-card"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="my-submissions-panel" class="submit-tab-panel" role="tabpanel" aria-labelledby="tab-my-submissions" hidden>
+            <p class="section-intro">Track what you have submitted and any notes from PTA admins.</p>
+            <div id="my-submissions" class="my-submissions-list"></div>
+          </div>
+
+          <div class="account-settings">
+            <button type="button" class="text-link" id="change-password-toggle">Change password</button>
+            <div id="change-password-panel" class="change-password-panel" hidden>
+              <div id="change-password-message" class="alert-banner" hidden></div>
+              <form id="change-password-form" class="stack-form">
+                <div class="form-field">
+                  <label for="new-password">New password</label>
+                  <input id="new-password" name="new-password" type="password" required minlength="8" autocomplete="new-password">
+                </div>
+                <div class="form-field">
+                  <label for="confirm-password">Confirm new password</label>
+                  <input id="confirm-password" name="confirm-password" type="password" required minlength="8" autocomplete="new-password">
+                </div>
+                <button class="btn btn-secondary" type="submit">Update password</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+  <div class="container footer-inner">
+    <p>&copy; 2025 Frazer School PTA. All rights reserved.</p>
+    <p class="footer-note">Serving Frazer Middle School and Frazer High School. Maintained by parent volunteers.</p>
+  </div>
+</footer>
+
+  <script src="assets/main.js"></script>
+  <script type="module" src="assets/submit.js"></script>
+</body>
+</html>
