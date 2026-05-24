@@ -1,8 +1,10 @@
 import { updatePassword, signOut } from './auth.js';
 import { showMessage } from './ui-messages.js';
+import { applyConfigNoticeContent } from './config-notice.js';
 import { requireSupabase, isSupabaseConfigured } from './supabase-client.js';
 
 const configNotice = document.getElementById('config-notice');
+applyConfigNoticeContent(configNotice);
 const resetPanel = document.getElementById('reset-panel');
 const invalidPanel = document.getElementById('invalid-panel');
 const resetForm = document.getElementById('reset-form');

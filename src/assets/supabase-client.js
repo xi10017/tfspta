@@ -4,11 +4,12 @@ let client = null;
 let configured = false;
 
 function isUsableSupabaseKey(key) {
-  if (!key || String(key).includes('YOUR_')) {
+  const value = String(key || '');
+  if (!value || value.includes('YOUR_')) {
     return false;
   }
-  // Use the legacy anon JWT from Supabase → Settings → API (starts with eyJ).
-  return String(key).startsWith('eyJ');
+  // Supabase → Project Settings → API: legacy anon JWT (eyJ…) or publishable key (sb_publishable_…).
+  return value.startsWith('eyJ') || value.startsWith('sb_publishable_');
 }
 
 try {

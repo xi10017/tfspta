@@ -15,6 +15,7 @@ import {
   INTENT_LABELS,
 } from './submission-workflow.js';
 import { notifyPendingContentChanged } from './pending-live.js';
+import { applyConfigNoticeContent } from './config-notice.js';
 import { requireSupabase, isSupabaseConfigured } from './supabase-client.js';
 import {
   loadSubmissionEventsMap,
@@ -27,6 +28,7 @@ const signinBlock = document.getElementById('signin-block');
 const resetPanel = document.getElementById('reset-panel');
 const submitPanel = document.getElementById('submit-panel');
 const configNotice = document.getElementById('config-notice');
+applyConfigNoticeContent(configNotice);
 const authForm = document.getElementById('auth-form');
 const resetForm = document.getElementById('reset-form');
 const submitForm = document.getElementById('submit-form');

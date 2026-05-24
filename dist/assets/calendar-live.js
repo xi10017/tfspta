@@ -22,7 +22,6 @@ import {
 } from './calendar-month.js';
 
 const liveRoot = document.getElementById('calendar-live');
-const staticFallback = document.getElementById('calendar-static-fallback');
 
 let signedIn = false;
 let submitterId = null;
@@ -252,10 +251,6 @@ function renderPage(showChangeRequests, hasPending, { bannerHtml = '' } = {}) {
   }
 
   liveRoot.innerHTML = `${bannerHtml}${renderPendingLiveNotice(hasPending)}${renderCalendarView(showChangeRequests)}`;
-
-  if (staticFallback) {
-    staticFallback.hidden = true;
-  }
 }
 
 function pickInitialSelection(events) {
@@ -314,8 +309,21 @@ function showEmptyCalendar(showChangeRequests, hasPending, { bannerHtml = '' } =
   renderPage(showChangeRequests, hasPending, { bannerHtml });
 }
 
-function handleCalendarInteraction(event) {
-  const target = event.target.closest('[data-action]');
+function handleCampusFilterChange(event) {
+  const target = event.target;
+  if (!(target instanceof HTMLSelectElement) || target.id !== 'calendar-campus-filter') {
+    return;
+  }
+  if (!liveRoot.contains(target)) {
+    return;
+  }
+
+  campusFilter = target.value;
+  renderPage(signedIn, hasPendingGhosts);
+}
+
+function handleCalendarClick(event) {
+  const target = event.target.closest('button[data-action]');
   if (!target || !liveRoot.contains(target)) {
     return;
   }
@@ -360,12 +368,6 @@ function handleCalendarInteraction(event) {
       viewYear = year;
       viewMonth = month - 1;
     }
-    renderPage(signedIn, hasPendingGhosts);
-    return;
-  }
-
-  if (action === 'cal-campus-filter' && target instanceof HTMLSelectElement) {
-    campusFilter = target.value;
     renderPage(signedIn, hasPendingGhosts);
   }
 }
@@ -425,8 +427,8 @@ async function initCalendarPage() {
     return;
   }
 
-  liveRoot.addEventListener('click', handleCalendarInteraction);
-  liveRoot.addEventListener('change', handleCalendarInteraction);
+  liveRoot.addEventListener('click', handleCalendarClick);
+  liveRoot.addEventListener('change', handleCampusFilterChange);
 
   pickInitialSelection([]);
   showEmptyCalendar(false, false);

@@ -136,14 +136,14 @@ export function renderCalendarControls({ year, month, campusFilter }) {
   return `
     <div class="calendar-controls">
       <div class="calendar-controls-nav">
-        <button type="button" class="btn btn-secondary btn-sm calendar-nav-btn" data-action="cal-prev-month" aria-label="Previous month">‹</button>
+        <button type="button" class="btn btn-secondary btn-sm calendar-nav-btn" data-action="cal-prev-month" aria-label="Previous month">←</button>
         <h2 class="calendar-month-label">${escapeHtml(formatMonthYear(year, month))}</h2>
-        <button type="button" class="btn btn-secondary btn-sm calendar-nav-btn" data-action="cal-next-month" aria-label="Next month">›</button>
+        <button type="button" class="btn btn-secondary btn-sm calendar-nav-btn" data-action="cal-next-month" aria-label="Next month">→</button>
         <button type="button" class="btn btn-secondary btn-sm" data-action="cal-today">Today</button>
       </div>
       <div class="calendar-controls-filter">
         <label class="visually-hidden" for="calendar-campus-filter">Filter by campus</label>
-        <select id="calendar-campus-filter" class="calendar-campus-filter" data-action="cal-campus-filter">
+        <select id="calendar-campus-filter" class="calendar-campus-filter">
           ${filterOptions}
         </select>
       </div>

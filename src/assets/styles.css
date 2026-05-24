@@ -1459,11 +1459,6 @@ a:hover {
   color: var(--color-text-muted);
 }
 
-#announcements-static-fallback[hidden],
-#calendar-static-fallback[hidden] {
-  display: none !important;
-}
-
 .auth-tabs {
   display: flex;
   gap: 0.5rem;
@@ -1822,6 +1817,19 @@ a:hover {
   padding-inline: 0.65rem;
   font-size: 1.25rem;
   line-height: 1;
+}
+
+/* Hero .btn-secondary is white-on-blue; calendar sits on a light background. */
+.calendar-controls .btn-secondary {
+  color: var(--color-blue);
+  background: var(--color-white);
+  border: 2px solid var(--color-border);
+}
+
+.calendar-controls .btn-secondary:hover {
+  color: var(--color-white);
+  background: var(--color-blue);
+  border-color: var(--color-blue);
 }
 
 .calendar-campus-filter {
