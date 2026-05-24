@@ -13,7 +13,6 @@ import {
 } from './pending-live.js';
 
 const liveRoot = document.getElementById('announcements-live');
-const staticFallback = document.getElementById('announcements-static-fallback');
 
 const tierOrder = [
   { key: 'Middle School', label: 'Middle School' },
@@ -132,10 +131,8 @@ async function loadAnnouncements(showChangeRequests = false, viewerId = null) {
   }
 
   if (!isSupabaseConfigured) {
-    liveRoot.innerHTML = '';
-    if (staticFallback) {
-      staticFallback.hidden = false;
-    }
+    liveRoot.innerHTML =
+      '<p class="empty-live">Announcements load from Supabase after the site is configured.</p>';
     return;
   }
 
@@ -160,9 +157,6 @@ async function loadAnnouncements(showChangeRequests = false, viewerId = null) {
 
     if (!published.length && !hasPending) {
       liveRoot.innerHTML = '<p class="empty-live">No published announcements yet. Check back soon.</p>';
-      if (staticFallback) {
-        staticFallback.hidden = false;
-      }
       return;
     }
 
@@ -181,15 +175,8 @@ async function loadAnnouncements(showChangeRequests = false, viewerId = null) {
       .join('');
 
     liveRoot.innerHTML = `${renderPendingLiveNotice(hasPending)}${tierHtml || '<p class="empty-live">No announcements in this view yet.</p>'}`;
-
-    if (staticFallback) {
-      staticFallback.hidden = true;
-    }
   } catch (error) {
     liveRoot.innerHTML = `<p class="form-message form-message--error">${escapeHtml(error.message)}</p>`;
-    if (staticFallback) {
-      staticFallback.hidden = false;
-    }
   }
 }
 

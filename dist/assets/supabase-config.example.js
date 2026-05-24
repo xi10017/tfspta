@@ -1,5 +1,5 @@
 // Copy this file to supabase-config.js and fill in your Supabase project values.
-// Project Settings → API → Project URL and anon public key
+// Project Settings → API → Project URL and anon public key (JWT eyJ… or sb_publishable_…).
 //
 // For password reset emails, add your site URL under Authentication → URL Configuration
 // (Site URL and Redirect URLs must include .../reset-password.html).
