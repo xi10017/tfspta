@@ -6,6 +6,25 @@ const SRC = path.join(ROOT, 'src');
 const PAGES = path.join(ROOT, 'pages');
 const DIST = path.join(ROOT, 'dist');
 
+//Convert all components to templates
+import { readdirSync, statSync } from 'fs';
+import { join, extname } from 'path';
+import { execSync } from 'child_process';
+
+function runTsFiles(dir) {
+  readdirSync(dir).forEach(file => {
+    const fullPath = join(dir, file);
+    if (statSync(fullPath).isDirectory()) {
+      runTsFiles(fullPath);
+    } else if (extname(file) === '.ts') {
+      execSync(`npx tsx "${fullPath}"`, { stdio: 'inherit' });
+    }
+		console.log("Ran a ts file");
+  });
+}
+
+runTsFiles(path.join(SRC,'components')); 
+
 const customTagRegex = /<([a-z0-9]+-[a-z0-9-]+)([\s\S]*?)\s*(?:\/>|>\s*<\/\1\s*>)/gi;
 
 function resolveCustomTags(html) {

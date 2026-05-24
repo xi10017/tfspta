@@ -538,6 +538,7 @@ htmlOutput += `</section>`;
 
 // 3. Save the HTML to a location of your choice
 // Change this file path to wherever you want the file to be saved on your computer
-const saveLocation = path.join(__dirname, 'src', 'templates', 'site-competitions.html');
+const ROOT = path.dirname(new URL(import.meta.url).pathname);
+const saveLocation = path.join(ROOT, '..', 'templates', 'site-competitions.html');
 
 fs.writeFileSync(saveLocation, htmlOutput, 'utf8');
