@@ -6,6 +6,7 @@
   "scripts": {
     "import": ".venv/bin/python scripts/import_activities.py",
     "build": "npm run import && node build_html.js",
+    "build:ci": "python3 scripts/import_activities.py && node build_html.js",
     "dev": "npm run build && npx --yes serve dist -l 3000"
   }
 }

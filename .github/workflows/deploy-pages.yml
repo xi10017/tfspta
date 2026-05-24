@@ -1,0 +1,84 @@
+# Builds dist/ and deploys to GitHub Pages.
+#
+# One-time setup (repo Settings):
+#   1. Pages → Build and deployment → Source: GitHub Actions
+#   2. Secrets → Actions → New repository secrets:
+#        SUPABASE_URL      (Project Settings → API → Project URL)
+#        SUPABASE_ANON_KEY (Project Settings → API → anon public key)
+#   3. Supabase → Authentication → URL Configuration:
+#        Site URL: https://xi10017.github.io/tfspta/
+#        Redirect URLs: https://xi10017.github.io/tfspta/reset-password.html
+#
+# Site URL: https://xi10017.github.io/tfspta/
+
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - feature/submission-workflow
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build site
+        run: npm run build:ci
+
+      - name: Write Supabase config
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::warning::SUPABASE_URL or SUPABASE_ANON_KEY not set — live/submit/admin will show as unconfigured."
+            cp dist/assets/supabase-config.example.js dist/assets/supabase-config.js
+          else
+            node scripts/write-supabase-config.mjs
+          fi
+
+      - name: Add .nojekyll
+        run: touch dist/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
