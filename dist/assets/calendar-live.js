@@ -227,8 +227,35 @@ function renderCalendarView(showChangeRequests) {
   `;
 }
 
-function renderPage(showChangeRequests, hasPending) {
-  liveRoot.innerHTML = `${renderPendingLiveNotice(hasPending)}${renderCalendarView(showChangeRequests)}`;
+function daysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function syncSelectionToViewMonth() {
+  if (!selectedDate) {
+    selectedDate = toDateKey(new Date(viewYear, viewMonth, 1));
+    return;
+  }
+
+  const [year, month, day] = selectedDate.split('-').map(Number);
+  if (year === viewYear && month - 1 === viewMonth) {
+    return;
+  }
+
+  const clampedDay = Math.min(day, daysInMonth(viewYear, viewMonth));
+  selectedDate = toDateKey(new Date(viewYear, viewMonth, clampedDay));
+}
+
+function renderPage(showChangeRequests, hasPending, { bannerHtml = '' } = {}) {
+  if (!liveRoot) {
+    return;
+  }
+
+  liveRoot.innerHTML = `${bannerHtml}${renderPendingLiveNotice(hasPending)}${renderCalendarView(showChangeRequests)}`;
+
+  if (staticFallback) {
+    staticFallback.hidden = true;
+  }
 }
 
 function pickInitialSelection(events) {
@@ -242,6 +269,9 @@ function pickInitialSelection(events) {
 
   if (hasToday) {
     selectedDate = today;
+    viewYear = new Date().getFullYear();
+    viewMonth = new Date().getMonth();
+    hasInitializedView = true;
     return;
   }
 
@@ -256,6 +286,7 @@ function pickInitialSelection(events) {
     const [year, month] = upcoming.split('-').map(Number);
     viewYear = year;
     viewMonth = month - 1;
+    hasInitializedView = true;
     return;
   }
 
@@ -265,11 +296,22 @@ function pickInitialSelection(events) {
     const [year, month] = last.split('-').map(Number);
     viewYear = year;
     viewMonth = month - 1;
+    hasInitializedView = true;
     return;
   }
 
   selectedDate = today;
+  viewYear = new Date().getFullYear();
+  viewMonth = new Date().getMonth();
   hasInitializedView = true;
+}
+
+function showEmptyCalendar(showChangeRequests, hasPending, { bannerHtml = '' } = {}) {
+  if (!hasInitializedView) {
+    pickInitialSelection([]);
+  }
+  syncSelectionToViewMonth();
+  renderPage(showChangeRequests, hasPending, { bannerHtml });
 }
 
 function handleCalendarInteraction(event) {
@@ -286,6 +328,7 @@ function handleCalendarInteraction(event) {
       viewMonth = 11;
       viewYear -= 1;
     }
+    syncSelectionToViewMonth();
     renderPage(signedIn, hasPendingGhosts);
     return;
   }
@@ -296,6 +339,7 @@ function handleCalendarInteraction(event) {
       viewMonth = 0;
       viewYear += 1;
     }
+    syncSelectionToViewMonth();
     renderPage(signedIn, hasPendingGhosts);
     return;
   }
@@ -311,6 +355,11 @@ function handleCalendarInteraction(event) {
 
   if (action === 'cal-select-day') {
     selectedDate = target.dataset.date || null;
+    const [year, month] = (selectedDate || '').split('-').map(Number);
+    if (year && month) {
+      viewYear = year;
+      viewMonth = month - 1;
+    }
     renderPage(signedIn, hasPendingGhosts);
     return;
   }
@@ -327,10 +376,12 @@ async function loadEvents(showChangeRequests = false, viewerId = null) {
   }
 
   if (!isSupabaseConfigured) {
-    liveRoot.innerHTML = '';
-    if (staticFallback) {
-      staticFallback.hidden = false;
-    }
+    allEvents = [];
+    hasPendingGhosts = false;
+    showEmptyCalendar(showChangeRequests, false, {
+      bannerHtml:
+        '<p class="calendar-banner calendar-banner--info">Live events load from Supabase after the site is configured.</p>',
+    });
     return;
   }
 
@@ -354,35 +405,37 @@ async function loadEvents(showChangeRequests = false, viewerId = null) {
     hasPendingGhosts = hasPending;
     allEvents = buildEventList(published, pending);
 
-    if (!allEvents.length) {
-      hasInitializedView = false;
-      pickInitialSelection([]);
-    } else {
+    if (!hasInitializedView) {
       pickInitialSelection(allEvents);
     }
 
+    syncSelectionToViewMonth();
     renderPage(showChangeRequests, hasPending);
-
-    if (staticFallback) {
-      staticFallback.hidden = true;
-    }
   } catch (error) {
-    liveRoot.innerHTML = `<p class="form-message form-message--error">${escapeHtml(error.message)}</p>`;
-    if (staticFallback) {
-      staticFallback.hidden = false;
-    }
+    allEvents = [];
+    hasPendingGhosts = false;
+    showEmptyCalendar(showChangeRequests, false, {
+      bannerHtml: `<p class="form-message form-message--error">${escapeHtml(error.message)}</p>`,
+    });
   }
 }
 
 async function initCalendarPage() {
+  if (!liveRoot) {
+    return;
+  }
+
+  liveRoot.addEventListener('click', handleCalendarInteraction);
+  liveRoot.addEventListener('change', handleCalendarInteraction);
+
+  pickInitialSelection([]);
+  showEmptyCalendar(false, false);
+
   if (isSupabaseConfigured) {
     const session = await ensureAuthenticatedSession();
     signedIn = !!session;
     submitterId = session?.user?.id || null;
   }
-
-  liveRoot?.addEventListener('click', handleCalendarInteraction);
-  liveRoot?.addEventListener('change', handleCalendarInteraction);
 
   await loadEvents(signedIn, submitterId);
 

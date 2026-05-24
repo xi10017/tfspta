@@ -1778,6 +1778,19 @@ a:hover {
 }
 
 /* Month calendar */
+.calendar-banner {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  border-radius: var(--radius);
+}
+
+.calendar-banner--info {
+  color: var(--color-blue);
+  background: #eef4ff;
+  border: 1px solid #c5d9f5;
+}
+
 .calendar-controls {
   display: flex;
   flex-wrap: wrap;
