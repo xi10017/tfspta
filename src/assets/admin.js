@@ -2,6 +2,7 @@ import { getSession, getProfile, signIn, signOut, isAdmin, ensureProfile, ensure
 import { initPasswordResetRequest } from './auth-reset-request.js';
 import { initChangePassword } from './auth-change-password.js';
 import { showMessage, showUndoToast } from './ui-messages.js';
+import { applyConfigNoticeContent } from './config-notice.js';
 import { requireSupabase, isSupabaseConfigured } from './supabase-client.js';
 import { INTENT_LABELS, getTargetFieldForType } from './submission-workflow.js';
 import { notifyPendingContentChanged } from './pending-live.js';
@@ -36,6 +37,7 @@ import {
 } from './submission-archive.js';
 
 const configNotice = document.getElementById('config-notice');
+applyConfigNoticeContent(configNotice);
 const authPanel = document.getElementById('auth-panel');
 const adminPanel = document.getElementById('admin-panel');
 const deniedPanel = document.getElementById('denied-panel');
