@@ -3,10 +3,20 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 let client = null;
 let configured = false;
 
+function isUsableSupabaseKey(key) {
+  if (!key || String(key).includes('YOUR_')) {
+    return false;
+  }
+  // Use the legacy anon JWT from Supabase → Settings → API (starts with eyJ).
+  return String(key).startsWith('eyJ');
+}
+
 try {
   const { supabaseConfig } = await import('./supabase-config.js');
-  if (supabaseConfig?.url && supabaseConfig?.anonKey && !supabaseConfig.url.includes('YOUR_PROJECT')) {
-    client = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+  const url = supabaseConfig?.url;
+  const key = supabaseConfig?.anonKey;
+  if (url && key && !url.includes('YOUR_PROJECT') && isUsableSupabaseKey(key)) {
+    client = createClient(url, key);
     configured = true;
   }
 } catch {
