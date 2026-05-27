@@ -1,4 +1,4 @@
-import { getSession, getProfile, signIn, signUp, signOut, ensureProfile, ensureAuthenticatedSession } from './auth.js';
+import { getSession, getProfile, isAdmin, signIn, signUp, signOut, ensureProfile, ensureAuthenticatedSession } from './auth.js';
 import { initPasswordResetRequest } from './auth-reset-request.js';
 import { initChangePassword } from './auth-change-password.js';
 import { showMessage } from './ui-messages.js';
@@ -327,6 +327,12 @@ async function refreshUI() {
   authPanel.hidden = true;
   submitPanel.hidden = false;
   userLabel.textContent = profile?.full_name || session.user.email || 'Signed in';
+
+  const adminLink = document.getElementById('admin-link');
+  if (adminLink) {
+    adminLink.hidden = !isAdmin(profile);
+  }
+
   await loadMySubmissions();
   applyStoredSubmitType();
 }
