@@ -189,8 +189,18 @@ create policy "Profiles: users insert own"
 
 create policy "Profiles: users update own name"
   on public.profiles for update
+  to authenticated
   using (auth.uid() = id)
-  with check (auth.uid() = id);
+  with check (
+    auth.uid() = id
+    and role = (select p.role from public.profiles p where p.id = auth.uid())
+  );
+
+create policy "Profiles: admin update role"
+  on public.profiles for update
+  to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
 
 -- Submissions
 create policy "Submissions: authenticated insert"

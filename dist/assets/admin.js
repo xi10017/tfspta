@@ -50,7 +50,6 @@ const publishedEventsEl = document.getElementById('published-events');
 const publishedCompetitionsEl = document.getElementById('published-competitions');
 const publishedClubsEl = document.getElementById('published-clubs');
 const adminUserLabel = document.getElementById('admin-user-label');
-const deniedDetails = document.getElementById('denied-details');
 const deniedSignOutBtn = document.getElementById('admin-sign-out-denied');
 const signinBlock = document.getElementById('admin-signin-block');
 const resetPanel = document.getElementById('reset-panel');
@@ -68,6 +67,9 @@ const adminArchivePanel = document.getElementById('admin-archive-panel');
 const rejectedInboxEl = document.getElementById('rejected-inbox');
 const archivedSubmissionsEl = document.getElementById('archived-submissions');
 const archivedOrphansEl = document.getElementById('archived-orphans');
+const tabAdminUsers = document.getElementById('tab-admin-users');
+const adminUsersPanel = document.getElementById('admin-users-panel');
+const usersListEl = document.getElementById('users-list');
 
 let liveSubmissionState = {
   submissionIds: new Set(),
@@ -267,16 +269,19 @@ function setAdminTab(mode) {
   const isPublished = mode === 'published';
   const isRejected = mode === 'rejected';
   const isArchive = mode === 'archive';
-  const isInbox = !isPublished && !isRejected && !isArchive;
+  const isUsers = mode === 'users';
+  const isInbox = !isPublished && !isRejected && !isArchive && !isUsers;
 
   tabAdminInbox?.classList.toggle('is-active', isInbox);
   tabAdminPublished?.classList.toggle('is-active', isPublished);
   tabAdminRejected?.classList.toggle('is-active', isRejected);
   tabAdminArchive?.classList.toggle('is-active', isArchive);
+  tabAdminUsers?.classList.toggle('is-active', isUsers);
   tabAdminInbox?.setAttribute('aria-selected', String(isInbox));
   tabAdminPublished?.setAttribute('aria-selected', String(isPublished));
   tabAdminRejected?.setAttribute('aria-selected', String(isRejected));
   tabAdminArchive?.setAttribute('aria-selected', String(isArchive));
+  tabAdminUsers?.setAttribute('aria-selected', String(isUsers));
 
   if (adminInboxPanel) {
     adminInboxPanel.hidden = !isInbox;
@@ -290,6 +295,9 @@ function setAdminTab(mode) {
   if (adminArchivePanel) {
     adminArchivePanel.hidden = !isArchive;
   }
+  if (adminUsersPanel) {
+    adminUsersPanel.hidden = !isUsers;
+  }
 
   if (isPublished) {
     loadPublishedContent().catch((error) => showMessage(null, error.message, 'error'));
@@ -299,6 +307,9 @@ function setAdminTab(mode) {
   }
   if (isArchive) {
     loadArchiveContent().catch((error) => showMessage(null, error.message, 'error'));
+  }
+  if (isUsers) {
+    loadUsersContent().catch((error) => showMessage(null, error.message, 'error'));
   }
 }
 
@@ -816,6 +827,100 @@ async function loadArchiveContent() {
   renderArchivedOrphans(orphans);
 }
 
+let currentAdminId = null;
+
+async function loadUsersContent() {
+  if (!usersListEl) {
+    return;
+  }
+
+  const supabase = requireSupabase();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, email, full_name, role, created_at')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    usersListEl.innerHTML = `<p class="form-message form-message--error">${escapeHtml(error.message)}</p>`;
+    return;
+  }
+
+  const users = data || [];
+  if (!users.length) {
+    usersListEl.innerHTML = '<p class="empty-inbox">No user accounts found.</p>';
+    return;
+  }
+
+  usersListEl.innerHTML = users
+    .map((user) => {
+      const isCurrentUser = user.id === currentAdminId;
+      const isUserAdmin = user.role === 'admin';
+      const roleClass = isUserAdmin ? 'inbox-status--approved' : '';
+      const actionButton = isCurrentUser
+        ? '<span class="user-you-badge">You</span>'
+        : isUserAdmin
+          ? `<button type="button" class="btn btn-secondary btn-sm" data-action="demote-user" data-user-id="${escapeHtml(user.id)}">Demote to parent</button>`
+          : `<button type="button" class="btn btn-primary btn-sm" data-action="promote-user" data-user-id="${escapeHtml(user.id)}">Promote to admin</button>`;
+
+      return `
+        <article class="inbox-card user-card" data-user-id="${escapeHtml(user.id)}">
+          <div class="inbox-card-header">
+            <div>
+              <strong>${escapeHtml(user.full_name || user.email || 'No name')}</strong>
+              <span class="inbox-status ${roleClass}">${escapeHtml(user.role)}</span>
+            </div>
+            <time datetime="${user.created_at}">${formatDate(user.created_at)}</time>
+          </div>
+          <p class="inbox-meta">${escapeHtml(user.email || '—')}</p>
+          <div class="inbox-actions">${actionButton}</div>
+        </article>
+      `;
+    })
+    .join('');
+}
+
+usersListEl?.addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-action]');
+  if (!button) {
+    return;
+  }
+
+  const userId = button.dataset.userId;
+  const action = button.dataset.action;
+  if (!userId || (action !== 'promote-user' && action !== 'demote-user')) {
+    return;
+  }
+
+  const newRole = action === 'promote-user' ? 'admin' : 'parent';
+  const verb = action === 'promote-user' ? 'Promote' : 'Demote';
+  const card = button.closest('.user-card');
+  const name = card?.querySelector('strong')?.textContent || 'this user';
+
+  if (!window.confirm(`${verb} ${name} to ${newRole}?`)) {
+    return;
+  }
+
+  button.disabled = true;
+
+  try {
+    const supabase = requireSupabase();
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('id', userId);
+
+    if (error) {
+      throw error;
+    }
+
+    showMessage(adminMessage, `${name} is now a ${newRole}.`, 'success');
+    await loadUsersContent();
+  } catch (err) {
+    showMessage(null, err.message, 'error');
+    button.disabled = false;
+  }
+});
+
 async function refreshUI() {
   if (!isSupabaseConfigured) {
     configNotice.hidden = false;
@@ -848,21 +953,6 @@ async function refreshUI() {
     authPanel.hidden = true;
     adminPanel.hidden = true;
     deniedPanel.hidden = false;
-
-    if (deniedDetails) {
-      const lines = [
-        `Signed in as: ${session.user.email}`,
-        `User id: ${session.user.id}`,
-      ];
-      if (profileError) {
-        lines.push(`Profile error: ${profileError.message}`);
-      } else if (profile) {
-        lines.push(`Current role: ${profile.role}`);
-      } else {
-        lines.push('No profile row found for this account.');
-      }
-      deniedDetails.textContent = lines.join(' · ');
-    }
     return;
   }
 
@@ -870,6 +960,7 @@ async function refreshUI() {
   deniedPanel.hidden = true;
   adminPanel.hidden = false;
   adminUserLabel.textContent = profile.full_name || profile.email;
+  currentAdminId = session.user.id;
   setAdminTab('inbox');
   await reloadAdminData();
 }
@@ -924,6 +1015,7 @@ tabAdminInbox?.addEventListener('click', () => setAdminTab('inbox'));
 tabAdminPublished?.addEventListener('click', () => setAdminTab('published'));
 tabAdminRejected?.addEventListener('click', () => setAdminTab('rejected'));
 tabAdminArchive?.addEventListener('click', () => setAdminTab('archive'));
+tabAdminUsers?.addEventListener('click', () => setAdminTab('users'));
 
 async function handleSubmissionCardClick(event) {
   const button = event.target.closest('button[data-action]');
