@@ -94,8 +94,7 @@
         <div id="denied-panel" class="notice-card" hidden>
           <h2>Admin access only</h2>
           <p>This inbox is for PTA admins. Your account is signed in but does not have the admin role yet.</p>
-          <p id="denied-details" class="denied-details"></p>
-          <p>In Supabase SQL Editor, run <code>supabase/promote-admin.sql</code>, then sign out and sign in again.</p>
+          <p>If you believe you should have access, contact an existing PTA admin to be promoted.</p>
           <p>
             <button type="button" class="btn btn-secondary" id="admin-sign-out-denied">Sign out</button>
             <a class="btn btn-secondary" href="submit.html">Back to submit page</a>
@@ -118,6 +117,7 @@
             <button type="button" class="auth-tab" id="tab-admin-published" role="tab" aria-selected="false" aria-controls="admin-published-panel">Live</button>
             <button type="button" class="auth-tab" id="tab-admin-rejected" role="tab" aria-selected="false" aria-controls="admin-rejected-panel">Rejected</button>
             <button type="button" class="auth-tab" id="tab-admin-archive" role="tab" aria-selected="false" aria-controls="admin-archive-panel">Archive</button>
+            <button type="button" class="auth-tab" id="tab-admin-users" role="tab" aria-selected="false" aria-controls="admin-users-panel">Users</button>
           </div>
 
           <div id="admin-inbox-panel" class="admin-tab-panel" role="tabpanel" aria-labelledby="tab-admin-inbox">
@@ -154,6 +154,11 @@
             <h3 class="school-tier-title">Other archived items</h3>
             <p class="section-intro">Published items with no linked submission (e.g. legacy entries).</p>
             <div id="archived-orphans" class="published-list"></div>
+          </div>
+
+          <div id="admin-users-panel" class="admin-tab-panel" role="tabpanel" aria-labelledby="tab-admin-users" hidden>
+            <p class="section-intro">Signed-up accounts. Promote a parent to admin, or demote an admin back to parent.</p>
+            <div id="users-list" class="inbox"></div>
           </div>
 
           <div class="account-settings">
