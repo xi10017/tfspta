@@ -1,0 +1,39 @@
+name: Supabase Heartbeat
+
+on:
+  schedule:
+    # Twice daily to keep steady activity on the Free plan.
+    # Times are UTC: 13:15 and 01:15.
+    - cron: '15 13 * * *'
+    - cron: '15 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Add repository secrets SUPABASE_URL and SUPABASE_ANON_KEY (Settings -> Secrets -> Actions), then rerun this workflow."
+            exit 1
+          fi
+
+      - name: Read one row from Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          curl --fail --silent --show-error \
+            --header "apikey: $SUPABASE_ANON_KEY" \
+            --header "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            --header "Accept: application/json" \
+            "$SUPABASE_URL/rest/v1/published_announcements?select=id&limit=1"
+          echo
+          echo "Supabase heartbeat succeeded."
