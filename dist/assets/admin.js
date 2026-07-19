@@ -114,6 +114,31 @@ async function loadLiveSubmissionState() {
   return liveSubmissionState;
 }
 
+async function loadSupersededSubmissionIds() {
+  const supabase = requireSupabase();
+  const supersededIds = new Set();
+
+  const { data, error } = await supabase
+    .from('published_item_versions')
+    .select('snapshot');
+
+  if (error) {
+    if (String(error.message || '').includes('published_item_versions')) {
+      return supersededIds;
+    }
+    throw error;
+  }
+
+  for (const row of data || []) {
+    const submissionId = row?.snapshot?.submission_id;
+    if (submissionId) {
+      supersededIds.add(submissionId);
+    }
+  }
+
+  return supersededIds;
+}
+
 function isSubmissionLive(item, state = liveSubmissionState) {
   if (item.status !== 'approved') {
     return null;
@@ -134,6 +159,7 @@ function isSubmissionLive(item, state = liveSubmissionState) {
 async function enforceApprovedPublishedSync() {
   const supabase = requireSupabase();
   await loadLiveSubmissionState();
+  const supersededSubmissionIds = await loadSupersededSubmissionIds();
 
   const { data: approved, error: approvedError } = await supabase
     .from('submissions')
@@ -149,6 +175,10 @@ async function enforceApprovedPublishedSync() {
 
   for (const submission of approved || []) {
     if (isSubmissionLive(submission)) {
+      continue;
+    }
+
+    if (submission.intent !== 'edit_published' && supersededSubmissionIds.has(submission.id)) {
       continue;
     }
 
