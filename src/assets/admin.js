@@ -1130,7 +1130,7 @@ archivedSubmissionsEl?.addEventListener('click', async (event) => {
 
   try {
     if (action === 'delete-submission') {
-      if (!window.confirm('Delete this archived submission permanently? This cannot be undone.')) {
+      if (!window.confirm('Delete this archived submission permanently? Archived items are otherwise kept for 30 days before automatic deletion. This cannot be undone.')) {
         button.disabled = false;
         return;
       }
@@ -1173,7 +1173,7 @@ archivedOrphansEl?.addEventListener('click', async (event) => {
 
   try {
     if (action === 'delete-orphan') {
-      if (!window.confirm('Delete this archived item permanently? This cannot be undone.')) {
+      if (!window.confirm('Delete this archived item permanently? Archived items are otherwise kept for 30 days before automatic deletion. This cannot be undone.')) {
         button.disabled = false;
         return;
       }
