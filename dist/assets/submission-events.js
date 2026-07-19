@@ -1,6 +1,7 @@
 import { getSession } from './auth.js';
 import { requireSupabase } from './supabase-client.js';
 import { notifyPendingContentChanged } from './pending-live.js';
+import { deleteSubmissionImagesIfUnused } from './submission-image-cleanup.js';
 import { publishSubmission, unpublishSubmission } from './submission-publish.js';
 
 export const EVENT_VERB = {
@@ -224,10 +225,25 @@ export async function recordRemovedFromSite(submissionId, actorId, notes = null)
 
 export async function deleteSubmissionPermanently(submissionId) {
   const supabase = requireSupabase();
+  const { data: submission, error: fetchError } = await supabase
+    .from('submissions')
+    .select('id, payload')
+    .eq('id', submissionId)
+    .single();
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
   const { error } = await supabase.from('submissions').delete().eq('id', submissionId);
   if (error) {
     throw error;
   }
+
+  await deleteSubmissionImagesIfUnused(submission?.payload?.image_path ? [submission.payload.image_path] : [], {
+    ignoreSubmissionId: submissionId,
+  });
+
   notifyPendingContentChanged();
 }
 

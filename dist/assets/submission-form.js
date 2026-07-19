@@ -264,7 +264,7 @@ export function buildSubmissionPayload(formData, type) {
 export function readPreviewValues(form, type) {
   const payload = buildSubmissionPayload(new FormData(form), type);
   payload.image_url = payload.image_preview_url || payload.image_url;
-  if (form?.querySelector('input[name="remove-image"]')?.checked) {
+  if (form?.querySelector('input[name="remove-image"]')?.value === 'true') {
     payload.image_url = '';
     payload.image_path = '';
   }

@@ -1,5 +1,6 @@
 import { requireSupabase } from './supabase-client.js';
 import { notifyPendingContentChanged } from './pending-live.js';
+import { deleteSubmissionImagesIfUnused } from './submission-image-cleanup.js';
 import { applyAdminAction, recordSubmissionEvent } from './submission-events.js';
 
 export function publishedSnapshotToPayload(contentType, snapshot) {
@@ -10,6 +11,8 @@ export function publishedSnapshotToPayload(contentType, snapshot) {
       body: snapshot.body || '',
       location: snapshot.location || '',
       date: snapshot.event_date || null,
+      image_url: snapshot.image_url || '',
+      image_path: snapshot.image_path || '',
     };
   }
 
@@ -24,6 +27,8 @@ export function publishedSnapshotToPayload(contentType, snapshot) {
       period: snapshot.period || '',
       level: snapshot.level || '',
       link: snapshot.link || '',
+      image_url: snapshot.image_url || '',
+      image_path: snapshot.image_path || '',
     };
   }
 
@@ -37,6 +42,8 @@ export function publishedSnapshotToPayload(contentType, snapshot) {
       period: snapshot.period || '',
       notes: snapshot.notes || '',
       link: snapshot.link || '',
+      image_url: snapshot.image_url || '',
+      image_path: snapshot.image_path || '',
     };
   }
 
@@ -45,6 +52,8 @@ export function publishedSnapshotToPayload(contentType, snapshot) {
     title: snapshot.title || '',
     body: snapshot.body || '',
     date: snapshot.announcement_date || null,
+    image_url: snapshot.image_url || '',
+    image_path: snapshot.image_path || '',
   };
 }
 
@@ -143,10 +152,25 @@ export async function restoreArchivedOrphanToQueue(archiveId, actorId) {
 
 export async function deleteArchivedOrphan(archiveId) {
   const supabase = requireSupabase();
+  const { data: row, error: fetchError } = await supabase
+    .from('archived_published_items')
+    .select('id, snapshot')
+    .eq('id', archiveId)
+    .single();
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
   const { error } = await supabase.from('archived_published_items').delete().eq('id', archiveId);
   if (error) {
     throw error;
   }
+
+  await deleteSubmissionImagesIfUnused(row?.snapshot?.image_path ? [row.snapshot.image_path] : [], {
+    ignoreArchiveId: archiveId,
+  });
+
   notifyPendingContentChanged();
 }
 
