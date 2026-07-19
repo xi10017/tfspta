@@ -297,6 +297,22 @@ Claims assessed:
 
 ---
 
+## Stage 15 — School logo + campus photo branding (local, Jul 19 2026)
+
+**Goal:** Replace the placeholder header mark with the real school logo and use the campus photo as the home hero background.
+
+**Added assets:**
+- `src/assets/school-logo.jpeg`
+- `src/assets/school-background.webp`
+
+**Frontend changes:**
+- `site-header.html` now uses the image logo instead of the text-only badge
+- `styles.css` updates logo sizing and adds the school photo as the home hero background with a dark overlay for readability
+
+**Effect:** The homepage branding now feels tied to the school itself rather than a generic PTA template, while keeping the existing text readable and mobile-safe.
+
+---
+
 ## Current architecture summary
 
 ```
