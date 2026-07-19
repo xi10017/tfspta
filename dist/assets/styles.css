@@ -753,8 +753,22 @@ a:hover {
   grid-template-columns: 1fr;
 }
 
+.contact-staff-list {
+  grid-template-columns: 1fr;
+}
+
 @media (min-width: 640px) {
   .school-tier .contact-details {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .contact-staff-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .contact-staff-list {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -771,6 +785,25 @@ a:hover {
 .contact-details dd {
   margin: 0;
   font-size: 1.0625rem;
+}
+
+.contact-directory-section {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.contact-directory-group h4 {
+  margin: 0 0 0.5rem;
+  color: var(--color-blue);
+}
+
+.contact-directory-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.contact-directory-list li + li {
+  margin-top: 0.375rem;
 }
 
 .contact-note {
