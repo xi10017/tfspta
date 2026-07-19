@@ -85,6 +85,8 @@ function renderPublishedClub(item, showChangeRequests) {
       period: item.period,
       notes: item.notes,
       link: item.link,
+      image_url: item.image_url,
+      image_path: item.image_path,
     },
     { publishedId: item.id },
   );
@@ -106,8 +108,8 @@ function renderPendingClubGhost(submission) {
 
 async function fetchPublishedClubs(supabase) {
   const withStatic = await supabase
-    .from('published_clubs')
-    .select('id, school, name, description, contact, eligibility, period, notes, link, published_at, static_entry_id')
+      .from('published_clubs')
+      .select('id, school, name, description, contact, eligibility, period, notes, link, image_url, image_path, published_at, static_entry_id')
     .order('published_at', { ascending: false });
 
   if (!withStatic.error) {
@@ -117,7 +119,7 @@ async function fetchPublishedClubs(supabase) {
   if (String(withStatic.error.message || '').includes('static_entry_id')) {
     return supabase
       .from('published_clubs')
-      .select('id, school, name, description, contact, eligibility, period, notes, link, published_at')
+      .select('id, school, name, description, contact, eligibility, period, notes, link, image_url, image_path, published_at')
       .order('published_at', { ascending: false });
   }
 

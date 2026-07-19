@@ -49,6 +49,7 @@ export function renderCompetitionEntry(item, { ghost = false, ghostLabel = 'Pend
   return `
     <article class="competition-entry${ghost ? ' ghost-preview-card entry-entry--pending' : ' entry-entry--published'}"${publishedId ? ` data-published-id="${escapeHtml(publishedId)}"` : ''}>
       ${badge}
+      ${item.image_url ? `<img class="entry-image" src="${escapeHtml(item.image_url)}" alt="">` : ''}
       <div class="entry-header">
         <h4>${escapeHtml(item.name || 'Competition name')}</h4>
         ${item.level ? `<span class="entry-level">${escapeHtml(item.level)}</span>` : ''}
@@ -77,6 +78,7 @@ export function renderClubEntry(item, { ghost = false, ghostLabel = 'Pending rev
   return `
     <article class="club-entry${ghost ? ' ghost-preview-card entry-entry--pending' : ' entry-entry--published'}"${publishedId ? ` data-published-id="${escapeHtml(publishedId)}"` : ''}>
       ${badge}
+      ${item.image_url ? `<img class="entry-image" src="${escapeHtml(item.image_url)}" alt="">` : ''}
       ${schoolTag}
       <h4>${escapeHtml(item.name || 'Club name')}</h4>
       <p class="entry-description">${escapeHtml(item.description || '')}</p>
@@ -102,6 +104,8 @@ export function publishedCompetitionToPayload(item) {
     period: item.period || '',
     level: item.level || '',
     link: item.link || '',
+    image_url: item.image_url || '',
+    image_path: item.image_path || '',
     ...(item.static_entry_id ? { static_entry_id: item.static_entry_id } : {}),
   };
 }
@@ -116,6 +120,8 @@ export function publishedClubToPayload(item) {
     period: item.period || '',
     notes: item.notes || '',
     link: item.link || '',
+    image_url: item.image_url || '',
+    image_path: item.image_path || '',
     ...(item.static_entry_id ? { static_entry_id: item.static_entry_id } : {}),
   };
 }
@@ -131,6 +137,8 @@ export function submissionPayloadToCompetition(payload) {
     period: payload.period || '',
     level: payload.level || '',
     link: payload.link || '',
+    image_url: payload.image_url || '',
+    image_path: payload.image_path || '',
   };
 }
 
@@ -144,5 +152,7 @@ export function submissionPayloadToClub(payload) {
     period: payload.period || '',
     notes: payload.notes || '',
     link: payload.link || '',
+    image_url: payload.image_url || '',
+    image_path: payload.image_path || '',
   };
 }

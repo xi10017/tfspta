@@ -87,6 +87,8 @@ function renderPublishedCompetition(item, showChangeRequests) {
       period: item.period,
       level: item.level,
       link: item.link,
+      image_url: item.image_url,
+      image_path: item.image_path,
     },
     { publishedId: item.id },
   );
@@ -108,8 +110,8 @@ function renderPendingCompetitionGhost(submission) {
 
 async function fetchPublishedCompetitions(supabase) {
   const withStatic = await supabase
-    .from('published_competitions')
-    .select('id, category, name, description, format, contact, eligibility, period, level, link, published_at, static_entry_id')
+      .from('published_competitions')
+      .select('id, category, name, description, format, contact, eligibility, period, level, link, image_url, image_path, published_at, static_entry_id')
     .order('published_at', { ascending: false });
 
   if (!withStatic.error) {
@@ -119,7 +121,7 @@ async function fetchPublishedCompetitions(supabase) {
   if (String(withStatic.error.message || '').includes('static_entry_id')) {
     return supabase
       .from('published_competitions')
-      .select('id, category, name, description, format, contact, eligibility, period, level, link, published_at')
+      .select('id, category, name, description, format, contact, eligibility, period, level, link, image_url, image_path, published_at')
       .order('published_at', { ascending: false });
   }
 

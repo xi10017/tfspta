@@ -53,11 +53,69 @@ function detailField(fid, label, name, { required = false, type = 'text', rows =
   `;
 }
 
+function imageFields(fid) {
+  return `
+      <input type="hidden" id="${fid('image-url')}" name="image-url">
+      <input type="hidden" id="${fid('image-path')}" name="image-path">
+      <input type="hidden" id="${fid('image-preview-url')}" name="image-preview-url">
+      <input type="hidden" id="${fid('image-crop-x')}" name="image-crop-x" value="0">
+      <input type="hidden" id="${fid('image-crop-y')}" name="image-crop-y" value="0">
+      <input type="hidden" id="${fid('image-crop-zoom')}" name="image-crop-zoom" value="1">
+      <input type="hidden" id="${fid('remove-image')}" name="remove-image" value="false">
+      <div class="form-field">
+        <label for="${fid('image-file')}">Image (optional)</label>
+        <div class="submission-image-panel" data-submission-image-field>
+          <div class="submission-image-picker">
+            <input class="submission-image-input" id="${fid('image-file')}" name="image-file" type="file" accept="image/jpeg,image/png,image/webp">
+            <label class="btn btn-secondary submission-image-picker-button" for="${fid('image-file')}">
+              <span>Choose image</span>
+            </label>
+            <span class="submission-image-picker-name" data-role="file-name">No file selected</span>
+            <button class="btn submission-image-remove" type="button" data-role="remove-image" hidden>Remove image</button>
+          </div>
+          <p class="field-hint">Upload a JPG, PNG, or WebP, then crop it to fit. Final images are standardized to 16:9 and compressed before upload.</p>
+          <div class="submission-image-current" data-role="current" hidden>
+            <div class="submission-image-current-header">
+              <p class="submission-image-label">Current image</p>
+            </div>
+            <img class="submission-image-current-preview" data-role="current-preview" alt="">
+          </div>
+
+          <div class="submission-image-editor" data-role="editor" hidden>
+            <div class="submission-image-editor-topline">
+              <p class="submission-image-label">Crop your image</p>
+              <button class="btn submission-image-reset" type="button" data-role="reset-crop">Reset crop</button>
+            </div>
+            <div class="submission-image-frame" data-role="frame">
+              <img class="submission-image-editor-preview" data-role="editor-image" alt="">
+            </div>
+            <div class="submission-image-controls">
+              <label class="submission-image-control">
+                <span>Zoom</span>
+                <input type="range" name="image-crop-zoom-slider" min="1" max="3" step="0.01" value="1" data-role="zoom">
+              </label>
+              <label class="submission-image-control">
+                <span>Left / right</span>
+                <input type="range" name="image-crop-x-slider" min="-1" max="1" step="0.01" value="0" data-role="pan-x">
+              </label>
+              <label class="submission-image-control">
+                <span>Up / down</span>
+                <input type="range" name="image-crop-y-slider" min="-1" max="1" step="0.01" value="0" data-role="pan-y">
+              </label>
+            </div>
+            <p class="field-hint">Drag the image or use the sliders to frame it the way you want.</p>
+          </div>
+        </div>
+      </div>
+  `;
+}
+
 export function getSubmissionFormHtml(type, { idPrefix = 'ctx-' } = {}) {
   const fid = (name) => fieldId(idPrefix, name);
 
   if (type === 'event') {
     return `
+      ${imageFields(fid)}
       <div class="form-field">
         <label for="${fid('school')}">Campus</label>
         <select id="${fid('school')}" name="school">${schoolOptions}</select>
@@ -87,6 +145,7 @@ export function getSubmissionFormHtml(type, { idPrefix = 'ctx-' } = {}) {
     ).join('');
 
     return `
+      ${imageFields(fid)}
       <div class="form-field">
         <label for="${fid('category')}">Category</label>
         <select id="${fid('category')}" name="category" required>${categoryOptions}</select>
@@ -104,6 +163,7 @@ export function getSubmissionFormHtml(type, { idPrefix = 'ctx-' } = {}) {
 
   if (type === 'club') {
     return `
+      ${imageFields(fid)}
       <div class="form-field">
         <label for="${fid('school')}">Campus</label>
         <select id="${fid('school')}" name="school">${schoolOptions}</select>
@@ -119,6 +179,7 @@ export function getSubmissionFormHtml(type, { idPrefix = 'ctx-' } = {}) {
   }
 
   return `
+    ${imageFields(fid)}
     <div class="form-field">
       <label for="${fid('school')}">Campus</label>
       <select id="${fid('school')}" name="school">${schoolOptions}</select>
@@ -150,6 +211,9 @@ export function buildSubmissionPayload(formData, type) {
       date: formData.get('event-date') || null,
       location: trimField(formData, 'location'),
       body: trimField(formData, 'body'),
+      image_preview_url: trimField(formData, 'image-preview-url'),
+      image_url: trimField(formData, 'image-url'),
+      image_path: trimField(formData, 'image-path'),
     };
   }
 
@@ -164,6 +228,9 @@ export function buildSubmissionPayload(formData, type) {
       period: trimField(formData, 'period'),
       level: trimField(formData, 'level'),
       link: trimField(formData, 'link'),
+      image_preview_url: trimField(formData, 'image-preview-url'),
+      image_url: trimField(formData, 'image-url'),
+      image_path: trimField(formData, 'image-path'),
     };
   }
 
@@ -177,6 +244,9 @@ export function buildSubmissionPayload(formData, type) {
       period: trimField(formData, 'period'),
       notes: trimField(formData, 'notes'),
       link: trimField(formData, 'link'),
+      image_preview_url: trimField(formData, 'image-preview-url'),
+      image_url: trimField(formData, 'image-url'),
+      image_path: trimField(formData, 'image-path'),
     };
   }
 
@@ -185,11 +255,20 @@ export function buildSubmissionPayload(formData, type) {
     title: trimField(formData, 'title'),
     date: formData.get('date') || null,
     body: trimField(formData, 'body'),
+    image_preview_url: trimField(formData, 'image-preview-url'),
+    image_url: trimField(formData, 'image-url'),
+    image_path: trimField(formData, 'image-path'),
   };
 }
 
 export function readPreviewValues(form, type) {
-  return buildSubmissionPayload(new FormData(form), type);
+  const payload = buildSubmissionPayload(new FormData(form), type);
+  payload.image_url = payload.image_preview_url || payload.image_url;
+  if (form?.querySelector('input[name="remove-image"]')?.checked) {
+    payload.image_url = '';
+    payload.image_path = '';
+  }
+  return payload;
 }
 
 export function renderAnnouncementPreview(payload, { ghost = false, ghostLabel = 'Preview — pending review' } = {}) {
@@ -203,6 +282,7 @@ export function renderAnnouncementPreview(payload, { ghost = false, ghostLabel =
   return `
     <article class="announcement-card${ghost ? ' ghost-preview-card' : ''}">
       ${ghost ? `<span class="ghost-preview-badge">${escapeHtml(ghostLabel)}</span>` : ''}
+      ${payload.image_url ? `<img class="announcement-image" src="${escapeHtml(payload.image_url)}" alt="">` : ''}
       ${schoolTag}
       ${date ? `<time class="announcement-date">${escapeHtml(date)}</time>` : ''}
       <h4>${escapeHtml(title)}</h4>
@@ -223,6 +303,7 @@ export function renderEventPreview(payload, { ghost = false, ghostLabel = 'Previ
   return `
     <article class="event-card${ghost ? ' ghost-preview-card' : ''}">
       ${ghost ? `<span class="ghost-preview-badge">${escapeHtml(ghostLabel)}</span>` : ''}
+      ${payload.image_url ? `<img class="event-image" src="${escapeHtml(payload.image_url)}" alt="">` : ''}
       ${schoolTag}
       <time class="event-date">${escapeHtml(dateLabel)}</time>
       <h4>${escapeHtml(title)}</h4>

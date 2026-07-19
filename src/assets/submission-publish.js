@@ -53,6 +53,8 @@ function recordFromCompetitionPayload(payload) {
     period: payload.period || '',
     level: payload.level || '',
     link: payload.link || '',
+    image_url: payload.image_url || '',
+    image_path: payload.image_path || '',
     static_entry_id: payload.static_entry_id || null,
   };
 }
@@ -67,6 +69,8 @@ function recordFromClubPayload(payload) {
     period: payload.period || '',
     notes: payload.notes || '',
     link: payload.link || '',
+    image_url: payload.image_url || '',
+    image_path: payload.image_path || '',
     static_entry_id: payload.static_entry_id || null,
   };
 }
@@ -398,6 +402,8 @@ export async function publishSubmission(submission, { actorId = null } = {}) {
           title: payload.title,
           body: payload.body,
           announcement_date: payload.date || null,
+          image_url: payload.image_url || '',
+          image_path: payload.image_path || '',
           submission_id: submission.id,
         },
         { submissionId: submission.id, actorId },
@@ -421,6 +427,8 @@ export async function publishSubmission(submission, { actorId = null } = {}) {
           location: payload.location || '',
           body: payload.body || '',
           event_date: payload.date || null,
+          image_url: payload.image_url || '',
+          image_path: payload.image_path || '',
           submission_id: submission.id,
         },
         { submissionId: submission.id, actorId },
@@ -450,6 +458,8 @@ export async function publishSubmission(submission, { actorId = null } = {}) {
         title: payload.title,
         body: payload.body,
         announcement_date: payload.date || null,
+        image_url: payload.image_url || '',
+        image_path: payload.image_path || '',
       },
       { actorId },
     );
@@ -463,6 +473,8 @@ export async function publishSubmission(submission, { actorId = null } = {}) {
         location: payload.location || '',
         body: payload.body || '',
         event_date: payload.date || null,
+        image_url: payload.image_url || '',
+        image_path: payload.image_path || '',
       },
       { actorId },
     );

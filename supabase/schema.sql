@@ -38,6 +38,8 @@ create table public.published_announcements (
   title text not null,
   body text not null,
   announcement_date date,
+  image_url text not null default '',
+  image_path text not null default '',
   submission_id uuid references public.submissions (id) on delete set null,
   published_at timestamptz not null default now()
 );
@@ -49,6 +51,8 @@ create table public.published_events (
   location text not null default '',
   body text not null default '',
   event_date date,
+  image_url text not null default '',
+  image_path text not null default '',
   submission_id uuid references public.submissions (id) on delete set null,
   published_at timestamptz not null default now()
 );
@@ -64,6 +68,8 @@ create table public.published_competitions (
   period text not null default '',
   level text not null default '',
   link text not null default '',
+  image_url text not null default '',
+  image_path text not null default '',
   submission_id uuid references public.submissions (id) on delete set null,
   published_at timestamptz not null default now()
 );
@@ -78,6 +84,8 @@ create table public.published_clubs (
   period text not null default '',
   notes text not null default '',
   link text not null default '',
+  image_url text not null default '',
+  image_path text not null default '',
   submission_id uuid references public.submissions (id) on delete set null,
   published_at timestamptz not null default now()
 );

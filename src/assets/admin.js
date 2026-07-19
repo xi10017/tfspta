@@ -402,6 +402,14 @@ function renderPayload(payload, type) {
     .join('');
 }
 
+function renderPayloadImage(payload) {
+  if (!payload?.image_url) {
+    return '';
+  }
+
+  return `<img class="entry-image inbox-payload-image" src="${escapeHtml(payload.image_url)}" alt="">`;
+}
+
 function escapeHtml(text) {
   return text
     .replace(/&/g, '&amp;')
@@ -575,6 +583,7 @@ function renderSubmissionCards(el, items, eventsBySubmission = new Map(), mode =
             <time datetime="${item.created_at}">${formatDate(item.created_at)}</time>
           </div>
           <p class="inbox-meta">Submitted by ${escapeHtml(submitter)}</p>
+          ${renderPayloadImage(item.payload)}
           <dl class="inbox-payload">${renderPayload(item.payload, item.content_type)}</dl>
           ${timeline}
           ${item.review_notes ? `<p class="inbox-review-notes"><strong>Latest note:</strong> ${escapeHtml(item.review_notes)}</p>` : ''}

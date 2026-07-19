@@ -10,6 +10,11 @@ import {
   renderSubmissionPreview,
 } from './submission-form.js';
 import {
+  attachSubmissionImage,
+  initSubmissionImageField,
+  syncSubmissionImageField,
+} from './submission-images.js';
+import {
   buildSubmissionInsertRecord,
   fillFormFromPayload,
   INTENT_LABELS,
@@ -105,6 +110,7 @@ function startEditingSubmission(item, action) {
   contentTypeSelect.disabled = true;
   renderTypeFields();
   fillFormFromPayload(submitForm, item.content_type, item.payload);
+  syncSubmissionImageField(submitForm);
   updateSubmitPreview();
 
   const title = submissionDisplayTitle(item.payload);
@@ -142,6 +148,10 @@ function submissionDisplayMeta(item) {
 function renderTypeFields() {
   const type = contentTypeSelect.value;
   typeFields.innerHTML = getSubmissionFormHtml(type, { idPrefix: '' });
+  initSubmissionImageField(submitForm, {
+    onPreviewChange: updateSubmitPreview,
+    onError: (error) => showMessage(submitMessage, error.message, 'error'),
+  });
   updateSubmitPreview();
 }
 
@@ -549,6 +559,11 @@ submitForm?.addEventListener('submit', async (event) => {
   submitButton.disabled = true;
 
   try {
+    await attachSubmissionImage(payload, submitForm, {
+      submitterId: session.user.id,
+      contentType: type,
+    });
+
     if (draftMode) {
       const wasResubmit = draftMode.action === 'resubmit';
       const intent =
@@ -586,6 +601,7 @@ submitForm?.addEventListener('submit', async (event) => {
 
       submitForm.reset();
       renderTypeFields();
+      syncSubmissionImageField(submitForm);
       updateSubmitPreview();
       showMessage(submitMessage, 'Submitted for review. A PTA admin will approve it before it appears on the site.', 'success');
     }

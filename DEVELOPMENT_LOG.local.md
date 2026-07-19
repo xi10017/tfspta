@@ -415,3 +415,84 @@ npm run dev            # build + serve dist (port may vary if 3000 busy)
 ---
 
 *Log compiled from project history, git commits, and assistant sessions through July 2026.*
+
+---
+
+## Update: July 19, 2026
+
+### What changed
+
+- Added optional image support for:
+  - announcements
+  - calendar events
+  - competitions
+  - clubs
+- Added a client-side image pipeline in `src/assets/submission-images.js`:
+  - file validation for JPG / PNG / WebP
+  - crop-to-16:9 processing
+  - compression before upload
+  - upload to Supabase Storage
+- Added an interactive crop step in the submission UI:
+  - drag-to-position
+  - zoom slider
+  - horizontal / vertical crop sliders
+  - reset crop action
+- Added image preview handling to both submit flows:
+  - main `submit.html` flow
+  - contextual “request a change” flow on live pages
+- Added image rendering on:
+  - live announcements
+  - live calendar events
+  - live competitions
+  - live clubs
+  - admin review cards
+- Fixed published clubs / competitions rendering so stored `image_url` and `image_path` actually reach the shared card renderer.
+- Fixed crop-direction mismatch so saved output matches the crop UI.
+- Refactored the button system:
+  - `btn` is now the shared base
+  - `btn-secondary` is the standard light-surface secondary button
+  - `btn-secondary-inverse` is the explicit dark-surface hero variant
+  - removed section-specific `.btn-secondary` overrides that were causing drift
+- Cleaned up the image uploader controls:
+  - replaced the remove-image checkbox with a button action
+  - uploader button now uses the shared button system
+  - remove button only turns red when there is an actual existing or newly selected image to remove
+
+### Key files added
+
+- `src/assets/submission-images.js`
+- `dist/assets/submission-images.js`
+- `supabase/published-images.sql`
+- `supabase/storage-submission-images.sql`
+
+### Key files updated
+
+- `src/assets/submission-form.js`
+- `src/assets/submit.js`
+- `src/assets/contextual-submit.js`
+- `src/assets/submission-workflow.js`
+- `src/assets/submission-publish.js`
+- `src/assets/announcements-live.js`
+- `src/assets/calendar-live.js`
+- `src/assets/competitions-live.js`
+- `src/assets/clubs-live.js`
+- `src/assets/admin.js`
+- `src/assets/entry-render.js`
+- `src/assets/styles.css`
+- `src/templates/site-hero.html`
+- `supabase/schema.sql`
+- `supabase/published-competitions-clubs.sql`
+
+### Supabase manual follow-up
+
+Run these in Supabase SQL editor:
+
+- `supabase/published-images.sql`
+- `supabase/storage-submission-images.sql`
+
+If starting from a fresh schema, `supabase/schema.sql` now already includes the published-image columns.
+
+### Verification performed
+
+- `npm run build`
+- visual iteration on uploader / crop / button states during local testing

@@ -26,6 +26,17 @@ export function fillFormFromPayload(form, type, payload) {
     return;
   }
 
+  setField(form, 'image-url', payload.image_url || '');
+  setField(form, 'image-path', payload.image_path || '');
+  setField(form, 'image-preview-url', payload.image_url || '');
+  setField(form, 'image-crop-x', 0);
+  setField(form, 'image-crop-y', 0);
+  setField(form, 'image-crop-zoom', 1);
+  const removeField = form.querySelector('[name="remove-image"]');
+  if (removeField) {
+    removeField.value = 'false';
+  }
+
   if (type === 'competition') {
     setField(form, 'category', payload.category || 'MISC');
     setField(form, 'name', payload.name || '');
@@ -71,6 +82,8 @@ export function publishedItemToPayload(item, type) {
       date: item.event_date || null,
       location: item.location || '',
       body: item.body || '',
+      image_url: item.image_url || '',
+      image_path: item.image_path || '',
     };
   }
 
@@ -87,6 +100,8 @@ export function publishedItemToPayload(item, type) {
     title: item.title || '',
     date: item.announcement_date || null,
     body: item.body || '',
+    image_url: item.image_url || '',
+    image_path: item.image_path || '',
   };
 }
 

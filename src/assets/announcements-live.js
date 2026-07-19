@@ -71,6 +71,7 @@ function renderAnnouncement(item, showChangeRequests) {
 
   return `
     <article class="announcement-card" data-published-id="${escapeHtml(item.id || '')}">
+      ${item.image_url ? `<img class="announcement-image" src="${escapeHtml(item.image_url)}" alt="">` : ''}
       ${schoolTag}
       ${date ? `<time class="announcement-date">${escapeHtml(date)}</time>` : ''}
       <h4>${escapeHtml(item.title)}</h4>
@@ -141,7 +142,7 @@ async function loadAnnouncements(showChangeRequests = false, viewerId = null) {
     const [publishedResult, pending] = await Promise.all([
       supabase
         .from('published_announcements')
-        .select('id, school, title, body, announcement_date, published_at')
+        .select('id, school, title, body, announcement_date, image_url, image_path, published_at')
         .order('announcement_date', { ascending: false, nullsFirst: false })
         .order('published_at', { ascending: false }),
       fetchPendingForLive(supabase, 'announcement', viewerId),

@@ -9,6 +9,11 @@ import {
   renderSubmissionPreview,
 } from './submission-form.js';
 import {
+  attachSubmissionImage,
+  initSubmissionImageField,
+  syncSubmissionImageField,
+} from './submission-images.js';
+import {
   buildSubmissionInsertRecord,
   fillFormFromPayload,
   targetPublishedIdForType,
@@ -101,6 +106,11 @@ export async function initContextualSubmit({ contentType, buttonLabel }) {
   const titleEl = mount.querySelector('#contextual-submit-title');
   const textEl = mount.querySelector('#contextual-submit-text');
 
+  initSubmissionImageField(form, {
+    onPreviewChange: updatePreview,
+    onError: (error) => showMessage(messageEl, error.message, 'error'),
+  });
+
   let composeOpen = false;
   let composeMode = 'create';
   let changeRequestPublishedId = null;
@@ -160,6 +170,7 @@ export async function initContextualSubmit({ contentType, buttonLabel }) {
     form.reset();
     showMessage(messageEl, '');
     resetComposeMode();
+    syncSubmissionImageField(form);
     updatePreview();
   }
 
@@ -181,6 +192,7 @@ export async function initContextualSubmit({ contentType, buttonLabel }) {
       : 'Propose updates to a published item. A PTA admin will review before anything changes on the site.';
     submitBtn.textContent = 'Submit change request';
     fillFormFromPayload(form, contentType, payload);
+    syncSubmissionImageField(form);
     openCompose({ scroll: true });
   }
 
@@ -212,6 +224,7 @@ export async function initContextualSubmit({ contentType, buttonLabel }) {
       : 'Propose updates to this listing. A PTA admin will review before anything changes on the site.';
     submitBtn.textContent = 'Submit change request';
     fillFormFromPayload(form, contentType, payload);
+    syncSubmissionImageField(form);
     openCompose({ scroll: true });
   }
 
@@ -243,6 +256,11 @@ export async function initContextualSubmit({ contentType, buttonLabel }) {
     submitBtn.disabled = true;
 
     try {
+      await attachSubmissionImage(payload, form, {
+        submitterId: activeSession.user.id,
+        contentType,
+      });
+
       const supabase = requireSupabase();
       const resolvedTargetId = await resolveLiveTarget(
         supabase,
@@ -273,6 +291,7 @@ export async function initContextualSubmit({ contentType, buttonLabel }) {
       await recordSubmissionEvent(created.id, 'submitted', activeSession.user.id);
 
       form.reset();
+      syncSubmissionImageField(form);
       updatePreview();
       showMessage(
         messageEl,

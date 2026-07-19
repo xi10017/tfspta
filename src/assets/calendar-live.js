@@ -121,6 +121,7 @@ function renderEventCard(event, showChangeRequests) {
   return `
     <article class="event-card event-card--published" data-published-id="${escapeHtml(event.id || '')}">
       <span class="event-status-badge event-status-badge--published">Published</span>
+      ${event.source?.image_url ? `<img class="event-image" src="${escapeHtml(event.source.image_url)}" alt="">` : ''}
       ${schoolTag}
       <time class="event-date" datetime="${escapeHtml(event.date || '')}">${escapeHtml(formatDisplayDate(event.date))}</time>
       <h4>${escapeHtml(event.title)}</h4>
@@ -392,7 +393,7 @@ async function loadEvents(showChangeRequests = false, viewerId = null) {
     const [publishedResult, pending] = await Promise.all([
       supabase
         .from('published_events')
-        .select('id, school, title, location, body, event_date, published_at')
+        .select('id, school, title, location, body, event_date, image_url, image_path, published_at')
         .order('event_date', { ascending: true, nullsFirst: false })
         .order('published_at', { ascending: false }),
       fetchPendingForLive(supabase, 'event', viewerId),

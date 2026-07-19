@@ -416,12 +416,20 @@ a:hover {
 
 /* Buttons */
 .btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   padding: 0.75rem 1.25rem;
+  font: inherit;
   font-weight: 600;
   font-size: 0.9375rem;
+  line-height: 1.2;
   text-decoration: none;
   border-radius: 8px;
+  border: 2px solid transparent;
+  appearance: none;
+  cursor: pointer;
   transition: background 0.2s, color 0.2s, transform 0.15s;
 }
 
@@ -440,12 +448,24 @@ a:hover {
 }
 
 .btn-secondary {
-  background: transparent;
-  color: var(--color-white);
-  border: 2px solid rgba(255, 255, 255, 0.55);
+  background: var(--color-white);
+  color: var(--color-blue);
+  border-color: var(--color-border);
 }
 
 .btn-secondary:hover {
+  background: var(--color-blue);
+  color: var(--color-white);
+  border-color: var(--color-blue);
+}
+
+.btn-secondary-inverse {
+  background: transparent;
+  color: var(--color-white);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.btn-secondary-inverse:hover {
   background: var(--color-white);
   color: var(--color-blue);
   border-color: var(--color-white);
@@ -1060,6 +1080,17 @@ a:hover {
   word-break: break-all;
 }
 
+.announcement-image,
+.event-image,
+.entry-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
 @media (min-width: 768px) {
   .entry-details {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1215,6 +1246,198 @@ a:hover {
 .form-field textarea {
   resize: vertical;
   min-height: 6rem;
+}
+
+.field-hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.submission-image-panel {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.submission-image-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+}
+
+.submission-image-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.submission-image-picker-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.submission-image-picker-button span {
+  display: inline-block;
+}
+
+.submission-image-picker-name {
+  min-width: 100%;
+  flex: 1 1 100%;
+  margin-top: -0.1rem;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.submission-image-current,
+.submission-image-editor {
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fbfcff 0%, #f2f6fc 100%);
+}
+
+.submission-image-editor-topline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.submission-image-current-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.submission-image-label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-blue);
+}
+
+.submission-image-current-preview,
+.submission-image-editor-preview {
+  display: block;
+  max-width: none;
+}
+
+.submission-image-current-preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.submission-image-frame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(0, 40, 104, 0.15), rgba(191, 10, 48, 0.12)),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.3) 0,
+      rgba(255, 255, 255, 0.3) 16px,
+      rgba(255, 255, 255, 0.12) 16px,
+      rgba(255, 255, 255, 0.12) 32px
+    );
+  border: 1px solid rgba(0, 40, 104, 0.14);
+  cursor: grab;
+  touch-action: none;
+}
+
+.submission-image-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.92);
+  pointer-events: none;
+}
+
+.submission-image-frame:active {
+  cursor: grabbing;
+}
+
+.submission-image-editor-preview {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform: translate(-50%, -50%);
+}
+
+.submission-image-controls {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.submission-image-control {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--color-blue);
+  font-weight: 600;
+}
+
+.submission-image-control span {
+  font-size: 0.95rem;
+}
+
+.submission-image-control input[type="range"] {
+  padding: 0;
+}
+
+.submission-image-reset {
+  min-width: 0;
+}
+
+.submission-image-remove--danger {
+  color: var(--color-white);
+  background: var(--color-red);
+  border-color: var(--color-red-dark);
+}
+
+.submission-image-remove--danger:hover {
+  background: var(--color-red-dark);
+  color: var(--color-white);
+  border-color: var(--color-red-dark);
+}
+
+@media (max-width: 640px) {
+  .submission-image-picker {
+    align-items: stretch;
+  }
+
+  .submission-image-picker-button,
+  .submission-image-remove {
+    width: 100%;
+  }
 }
 
 .alert-banner {
@@ -1563,20 +1786,6 @@ a:hover {
   color: var(--color-red);
 }
 
-.workflow-card .btn-secondary,
-.notice-card .btn-secondary {
-  color: var(--color-blue);
-  background: transparent;
-  border: 2px solid var(--color-border);
-}
-
-.workflow-card .btn-secondary:hover,
-.notice-card .btn-secondary:hover {
-  color: var(--color-white);
-  background: var(--color-blue);
-  border-color: var(--color-blue);
-}
-
 .account-settings {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
@@ -1661,18 +1870,6 @@ a:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-.contextual-compose .btn-secondary {
-  color: var(--color-blue);
-  background: transparent;
-  border: 2px solid var(--color-border);
-}
-
-.contextual-compose .btn-secondary:hover {
-  color: var(--color-white);
-  background: var(--color-blue);
-  border-color: var(--color-blue);
 }
 
 .contextual-preview-label {
@@ -1870,19 +2067,6 @@ a:hover {
   padding-inline: 0.65rem;
   font-size: 1.25rem;
   line-height: 1;
-}
-
-/* Hero .btn-secondary is white-on-blue; calendar sits on a light background. */
-.calendar-controls .btn-secondary {
-  color: var(--color-blue);
-  background: var(--color-white);
-  border: 2px solid var(--color-border);
-}
-
-.calendar-controls .btn-secondary:hover {
-  color: var(--color-white);
-  background: var(--color-blue);
-  border-color: var(--color-blue);
 }
 
 .calendar-campus-filter {
